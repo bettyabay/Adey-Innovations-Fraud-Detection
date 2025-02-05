@@ -89,10 +89,21 @@ def add_time_features(df):
     df['year'] = df['purchase_time'].dt.year
     return df
 
-# Normalization and Scaling
-def scale_data(df, columns, method='standard'):
-    scaler = StandardScaler() if method == 'standard' else MinMaxScaler()
-    df[columns] = scaler.fit_transform(df[columns])
+def scale_data(df, method='standard'):
+    scaler_std = StandardScaler()
+    scaler_minmax = MinMaxScaler()
+    
+    # Fraud_Data.csv: Standard Scaling for purchase_value and age
+    if 'purchase_value' in df.columns and 'age' in df.columns:
+        df[['purchase_value', 'age']] = scaler_std.fit_transform(df[['purchase_value', 'age']])
+    
+    # creditcard.csv: Standard Scaling for V1 - V28, Amount | MinMax Scaling for Time
+    creditcard_features = [f'V{i}' for i in range(1, 29)] + ['Amount']
+    if all(feature in df.columns for feature in creditcard_features):
+        df[creditcard_features] = scaler_std.fit_transform(df[creditcard_features])
+    if 'Time' in df.columns:
+        df[['Time']] = scaler_minmax.fit_transform(df[['Time']])
+
     return df
 
 # Encode Categorical Features
@@ -129,27 +140,6 @@ def heatmap_missing_values(df):
 
 
 
-    # Data Preprocessing
-    fraud_df = remove_duplicates(fraud_df)
-    fraud_df = correct_data_types(fraud_df)
-    fraud_df = handle_missing_values(fraud_df, strategy='mean')
-
-    # EDA
-    univariate_analysis(fraud_df, 'amount')
-    bivariate_analysis(fraud_df, 'user_id', 'amount')
-    correlation_heatmap(fraud_df)
-    pairplot_analysis(fraud_df)
-    scatter_plot(fraud_df, 'purchase_time', 'amount')
-
-    # Feature Engineering
-    fraud_df = add_time_features(fraud_df)
-    fraud_df = transaction_frequency(fraud_df)
-
-    # Scaling
-    fraud_df = scale_data(fraud_df, ['amount'], method='minmax')
-
-    # Encoding Categorical Features
-    fraud_df = encode_categorical(fraud_df, ['user_id'])
 
     # Visualizations
     distribution_plot(fraud_df, 'amount')
