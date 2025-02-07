@@ -37,12 +37,38 @@ def univariate_analysis(df, column, bins=30):
     plt.ylabel('Frequency')
     plt.show()
 
-def bivariate_analysis(df, col1, col2):
-    plt.figure(figsize=(8, 4))
-    sns.boxplot(x=df[col1], y=df[col2])
-    plt.title(f'Bivariate Analysis of {col1} vs {col2}')
-    plt.xlabel(col1)
-    plt.ylabel(col2)
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+
+def bivariate_analysis(df, col1, col2, bins=10):
+    # Create bins for the x-axis variable
+    if df[col1].dtype in ['int64', 'float64']:
+        df[col1 + '_binned'] = pd.cut(df[col1], bins=bins)
+        x_col = col1 + '_binned'
+    else:
+        x_col = col1
+
+    plt.figure(figsize=(12, 6))
+    
+    # Create a boxplot
+    sns.boxplot(x=df[x_col], y=df[col2], palette='Set2', fliersize=0)
+    
+    # Overlay jittered scatterplot for better visibility of data points
+    sns.stripplot(x=df[x_col], y=df[col2], color='black', alpha=0.5, size=3, jitter=True)
+    
+    plt.title(f'Bivariate Analysis of {col1} vs {col2}', fontsize=16)
+    plt.xlabel(col1, fontsize=14)
+    plt.ylabel(col2, fontsize=14)
+    
+    # Optionally set limits for better visibility
+    plt.ylim(df[col2].min() - 1, df[col2].max() + 1)
+    
+    plt.xticks(rotation=45)  # Rotate x-axis labels for better visibility
+    plt.grid(True)
     plt.show()
 
 def correlation_heatmap(df):
