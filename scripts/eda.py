@@ -172,3 +172,12 @@ def heatmap_missing_values(df):
     countplot_analysis(fraud_df, 'user_id')
     violin_plot(fraud_df, 'amount', 'user_id')
     heatmap_missing_values(fraud_df)
+
+
+def convert_intervals_to_midpoint(interval_str):
+    try:
+        # Extract numbers from the string and calculate the midpoint
+        lower, upper = map(float, interval_str.strip('()[]').split(','))
+        return (lower + upper) / 2
+    except ValueError:
+        return None  # Return None for any conversion issues
